@@ -67,7 +67,7 @@ mdls_fetch_vscode_bundle_id_from_path() {
         echo "Error: Bundle ID not found. Please check your VSCode path."
         exit 1
     fi
-    echo "$VSCODE_BUNDLEID path set to: $VSCODE_PATH"
+    echo "$VSCODE_BUNDLEID path set to '$VSCODE_PATH'"
     # echo "Bundle ID: $VSCODE_BUNDLEID"
 }
 
@@ -91,8 +91,12 @@ duti_check_install() {
         echo "Error: Homebrew package manager (https://brew.sh) required is not installed. Please install it first."
         exit 1
     fi
+
+    echo
     echo "⚠️ Installing duti using Homebrew..."
     brew install duti
+
+    echo
     sleep 0.5
     echo "duti installation completed."
 }
@@ -103,43 +107,47 @@ mvaassoc_duti_associate_extensions() {
     read -p "⚠️ Would you like to continue? (Y/n): " answer
     [ -n "$answer" ] && answer=${answer,,};
     if [ "$answer" != "y" ] && [ -n "$answer" ]; then
-        echo "Associations skipped. Signing off..."
+        echo "  Associations skipped. Signing off..."
         exit 1
     fi
 
+    echo
     SLEEP_TIME=$(echo "scale=2; 0.25 / ${#EXTENSIONS[@]}" | bc)
     for ext in "${EXTENSIONS[@]}"; do
         sleep $SLEEP_TIME
-        echo "Associating .$ext with VS Code"
+        echo "  Associating .$ext with VS Code"
         duti -s "$VSCODE_BUNDLEID" .$ext all
     done
+    
+    echo
     sleep 0.5
     echo "Association attempts completed."
 }
 
 # Main execution flow of the script
+echo 
 sleep 0.25
 mvassoc_parse_arguments "$@"
-echo
 
+echo
 sleep 0.25
 mvassoc_set_extensions
-echo 
 
+echo 
 sleep 0.25
 mdls_fetch_vscode_bundle_id_from_path
 duti_check_install
-echo
 
+echo
 sleep 0.5
 mvaassoc_duti_associate_extensions
-echo 
 
+echo 
 sleep 0.25
 echo "⚠️ Restarting Finder to update icon associations..."
 killall Finder
-echo 
 
+echo 
 sleep 0.25
 echo "Task attempt completed. Please check the associations. Closing..."
 exit 0
