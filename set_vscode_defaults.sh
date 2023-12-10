@@ -113,35 +113,48 @@ mdls_fetch_vscode_bundle_id_from_path() {
 }
 
 
-# Check if duti is installed, and propose installation via Homebrew if not
+# Function to check if 'duti' is installed and install it using Homebrew if not
 duti_check_install() {
+    # Check if the 'duti' command is available on the system
     if command -v duti &> /dev/null; then
+        # If 'duti' is already installed, inform the user and exit the function
         echo "duti is already installed."
         return 0
     fi
-    
+
+    # If 'duti' is not installed, inform the user
     echo "duti is not installed."
+
+    # Prompt the user to install 'duti' using Homebrew
     read -p "⚠️ Would you like to install it using Homebrew? (y/n): " answer
-    [ -n "${answer}" ] && answer=${answer,,}; # lowercase conversion
+
+    # Convert the user's answer to lowercase for consistent comparison
+    [ -n "${answer}" ] && answer=${answer,,}; 
+
+    # If the user's response is not 'y', skip the installation and exit
     if [ "$answer" != "y" ]; then
         echo "duti installation was skipped."
         exit 1
     fi
 
-    # Check if Homebrew is installed, we will not propose to install it
+    # Before proceeding with 'duti' installation, ensure Homebrew is installed
     if ! command -v brew &> /dev/null; then
+        # If Homebrew is not installed, inform the user and provide instructions
         echo "Error: Homebrew package manager (https://brew.sh) required is not installed. Please install it first."
         exit 1
     fi
 
+    # If Homebrew is installed, proceed with installing 'duti'
     echo
     echo "⚠️ Installing duti using Homebrew..."
     brew install duti
 
+    # Wait briefly before confirming completion
     echo
     sleep 0.5
     echo "duti installation completed."
 }
+
 
 # Associate each extension with Visual Studio Code using duti
 mvaassoc_duti_associate_extensions() {
