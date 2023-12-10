@@ -44,24 +44,43 @@ mvassoc_parse_arguments() {
 }
 
 
-# Sanitize and set the file extensions to be associated
+# Function to sanitize and set the file extensions to be associated
 mvassoc_set_extensions() {
+    # Check if custom extensions have been provided through the --ext flag
     if [ ${#CUSTOM_EXTENSIONS[@]} -ne 0 ]; then
+        # Inform the user that custom extensions are being used
         echo "Using custom extensions: "
+
+        # Iterate over each custom extension
         for i in "${!CUSTOM_EXTENSIONS[@]}"; do
+            # Remove any leading dot (.) from the extension for consistency
+            # The '#' character is a parameter expansion operator that removes the shortest match of '.' from the beginning of the string
             CUSTOM_EXTENSIONS[$i]=${CUSTOM_EXTENSIONS[$i]#.}
+
+            # Display each sanitized custom extension
             echo "  .${CUSTOM_EXTENSIONS[$i]}"
         done
+
+        # Set the EXTENSIONS array to the sanitized custom extensions
         EXTENSIONS=("${CUSTOM_EXTENSIONS[@]}")
+
+        # Exit the function successfully
         return 0
     fi 
-    
+
+    # If no custom extensions are provided, use the default set of extensions
     echo "Using default extensions:"
+
+    # Iterate over each default extension
     for i in "${!EXTENSIONS[@]}"; do
+        # Ensure each default extension is sanitized (removing any leading dot)
         EXTENSIONS[$i]=${EXTENSIONS[$i]#.}
+
+        # Display each sanitized default extension
         echo "  .${EXTENSIONS[$i]}"
     done
 }
+
 
 # Fetch the VSCode bundle ID from the provided path
 mdls_fetch_vscode_bundle_id_from_path() {
