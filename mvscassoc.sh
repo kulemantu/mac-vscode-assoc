@@ -8,7 +8,7 @@ VSCODE_PATH=""
 CUSTOM_EXTENSIONS=()
 
 # Function to parse command-line arguments
-mvassoc_parse_arguments() {
+mvscassoc_parse_arguments() {
     # Loop over all arguments passed to the script
     # This allows for handling multiple arguments and flags
     while [[ $# -gt 0 ]]; do
@@ -45,7 +45,7 @@ mvassoc_parse_arguments() {
 
 
 # Function to sanitize and set the file extensions to be associated
-mvassoc_set_extensions() {
+mvscassoc_set_extensions() {
     # Check if custom extensions have been provided through the --ext flag
     if [ ${#CUSTOM_EXTENSIONS[@]} -ne 0 ]; then
         # Inform the user that custom extensions are being used
@@ -157,7 +157,7 @@ duti_check_install() {
 
 
 # Function to associate each specified file extension with Visual Studio Code using the 'duti' utility
-mvassoc_duti_associate_extensions() {
+mvscassoc_duti_associate_extensions() {
     # Prompt the user for confirmation before proceeding with file associations
     # This is a safety measure to ensure the user is ready to make the changes
     read -p "⚠️ Would you like to continue? (Y/n): " answer
@@ -210,7 +210,7 @@ sleep 0.25
 
 # Parse the command-line arguments provided to the script
 # This function sets the VSCode path and custom extensions if provided
-mvassoc_parse_arguments "$@"
+mvscassoc_parse_arguments "$@"
 
 # Add a newline for output separation
 echo
@@ -220,7 +220,7 @@ sleep 0.25
 
 # Set the file extensions to be associated with VSCode
 # This function uses either the provided custom extensions or the default set
-mvassoc_set_extensions
+mvscassoc_set_extensions
 
 # Add a newline for output separation
 echo 
@@ -244,7 +244,7 @@ sleep 0.5
 
 # Associate the specified file extensions with VSCode using 'duti'
 # This function iterates over each extension and sets it to open with VSCode
-mvassoc_duti_associate_extensions
+mvscassoc_duti_associate_extensions
 
 # Add a newline for output separation
 echo 

@@ -26,11 +26,11 @@ This shell script is designed to easily set file associations to open with Visua
 2. **Run the Script**:
    - To use default extensions:
      ```
-     ./mvassoc.sh --path "/path/to/Visual Studio Code.app"
+     ./mvscassoc.sh --path "/path/to/Visual Studio Code.app"
      ```
    - To specify custom extensions:
      ```
-     ./mvassoc.sh --path "/path/to/Visual Studio Code.app" --ext py js html css
+     ./mvscassoc.sh --path "/path/to/Visual Studio Code.app" --ext py js html css
      ```
 
 3. **Follow the Prompts**: The script will guide you through the process.
@@ -41,7 +41,7 @@ You can customize the list of file extensions that you want to associate with Vi
 
 Example:
 ```
-./mvassoc.sh --path "/path/to/Visual Studio Code.app" --ext go rb php
+./mvscassoc.sh --path "/path/to/Visual Studio Code.app" --ext go rb php
 ```
 
 ## Contributing
