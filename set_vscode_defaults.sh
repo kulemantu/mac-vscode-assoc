@@ -156,28 +156,47 @@ duti_check_install() {
 }
 
 
-# Associate each extension with Visual Studio Code using duti
-mvaassoc_duti_associate_extensions() {
-    # Associations confirmation
+# Function to associate each specified file extension with Visual Studio Code using the 'duti' utility
+mvassoc_duti_associate_extensions() {
+    # Prompt the user for confirmation before proceeding with file associations
+    # This is a safety measure to ensure the user is ready to make the changes
     read -p "⚠️ Would you like to continue? (Y/n): " answer
+
+    # Convert the response to lowercase for consistent comparison
     [ -n "$answer" ] && answer=${answer,,};
+
+    # Check if the user's response is not 'y' (yes) and is not an empty string
+    # If so, skip the association process and exit the script
     if [ "$answer" != "y" ] && [ -n "$answer" ]; then
         echo "  Associations skipped. Signing off..."
         exit 1
     fi
 
-    echo
+    # Calculate the time to sleep between each association attempt
+    # This is done to prevent overwhelming the system with rapid successive commands
+    # The time is calculated based on the number of extensions to be processed
     SLEEP_TIME=$(echo "scale=2; 0.25 / ${#EXTENSIONS[@]}" | bc)
+
+    # Loop through each file extension in the EXTENSIONS array
     for ext in "${EXTENSIONS[@]}"; do
+        # Sleep for the calculated duration to pace the association commands
         sleep $SLEEP_TIME
+
+        # Echo the current operation to inform the user
+        # This indicates which file extension is currently being associated with VS Code
         echo "  Associating .$ext with VS Code"
+
+        # Execute the 'duti' command to associate the current file extension with VS Code
+        # This uses the bundle ID of VS Code and the file extension to set the association
         duti -s "$VSCODE_BUNDLEID" .$ext all
     done
     
+    # After processing all extensions, inform the user that the operation is complete
     echo
     sleep 0.5
     echo "Association attempts completed."
 }
+
 
 # ---------------------------------
 # MAIN execution flow of the script
@@ -225,7 +244,7 @@ sleep 0.5
 
 # Associate the specified file extensions with VSCode using 'duti'
 # This function iterates over each extension and sets it to open with VSCode
-mvaassoc_duti_associate_extensions
+mvassoc_duti_associate_extensions
 
 # Add a newline for output separation
 echo 
