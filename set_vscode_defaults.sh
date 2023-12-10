@@ -44,7 +44,7 @@ mvassoc_set_extensions() {
             echo "  .${CUSTOM_EXTENSIONS[$i]}"
         done
         EXTENSIONS=("${CUSTOM_EXTENSIONS[@]}")
-        exit 1
+        return 0
     fi 
     
     echo "Using default extensions:"
@@ -75,7 +75,7 @@ mdls_fetch_vscode_bundle_id_from_path() {
 duti_check_install() {
     if command -v duti &> /dev/null; then
         echo "duti is already installed."
-        return
+        return 0
     fi
     
     echo "duti is not installed."
