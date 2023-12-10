@@ -3,7 +3,7 @@
 # Default file extensions to associate with Visual Studio Code
 EXTENSIONS=("py" "js" "ts" "tsx" "css" "java" "cpp" "c" "json" "md" "xml" "sql" "php" "rb" "go" "sh")
 
-# Variables for the VSCode path and custom extensions
+# Variables for the path to Visual Studio Code and custom file extensions
 VSCODE_PATH=""
 CUSTOM_EXTENSIONS=()
 
@@ -125,29 +125,71 @@ mvaassoc_duti_associate_extensions() {
 }
 
 # Main execution flow of the script
+
+# Print a newline for better output readability
 echo 
+
+# Short pause for better output readability
 sleep 0.25
+
+# Parse the command-line arguments provided to the script
+# This function sets the VSCode path and custom extensions if provided
 mvassoc_parse_arguments "$@"
 
+# Add a newline for output separation
 echo
+
+# Short pause before processing extensions
 sleep 0.25
+
+# Set the file extensions to be associated with VSCode
+# This function uses either the provided custom extensions or the default set
 mvassoc_set_extensions
 
+# Add a newline for output separation
 echo 
+
+# Short pause before fetching the bundle ID
 sleep 0.25
+
+# Fetch the VSCode bundle ID from the provided path
+# This function ensures that the correct bundle ID is retrieved for the association process
 mdls_fetch_vscode_bundle_id_from_path
+
+# Check for the installation of 'duti' and install it using Homebrew if not present
+# 'duti' is a tool required for changing file associations on macOS
 duti_check_install
 
+# Add a newline for output separation
 echo
+
+# Short pause before starting the association process
 sleep 0.5
+
+# Associate the specified file extensions with VSCode using 'duti'
+# This function iterates over each extension and sets it to open with VSCode
 mvaassoc_duti_associate_extensions
 
+# Add a newline for output separation
 echo 
+
+# Short pause before restarting Finder
 sleep 0.25
+
+# Restart Finder to apply the updated file associations
+# This is required as Finder caches file association information
 echo "⚠️ Restarting Finder to update icon associations..."
 killall Finder
 
+# Add a newline for output separation
 echo 
+
+# Short pause before the final message
 sleep 0.25
+
+# Final message indicating that the script has completed its tasks
+# Prompt the user to check the updated file associations
 echo "Task attempt completed. Please check the associations. Closing..."
+
+# Exit the script
 exit 0
