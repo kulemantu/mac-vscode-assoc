@@ -1,152 +1,137 @@
 #!/bin/bash
 
-# Default extensions
+# Default file extensions to associate with Visual Studio Code
 EXTENSIONS=("py" "js" "ts" "tsx" "css" "java" "cpp" "c" "json" "md" "xml" "sql" "php" "rb" "go" "sh")
 
-# Initialize variables for path and custom extensions
+# Variables for the VSCode path and custom extensions
 VSCODE_PATH=""
 CUSTOM_EXTENSIONS=()
 
-# ARGUMENTS
-# Parse command-line arguments
-sleep 0.25
-while [[ $# -gt 0 ]]; do
-    key="$1"
+# Function to parse command-line arguments
+mvassoc_parse_arguments() {
+    # Parse command-line arguments for path and extensions
+    while [[ $# -gt 0 ]]; do
+        key="$1"
 
-    case $key in
-        --path|-p)
-            VSCODE_PATH="$2"
-            shift # past argument
-            shift # past value
-            ;;
-        --ext)
-            while [[ $# -gt 1 && ! $2 == --* ]]; do
-                CUSTOM_EXTENSIONS+=("$2")
-                shift # past each extension
-            done
-            shift # past --ext
-            ;;
-        *)    # unknown option
-            shift # past argument
-            ;;
-    esac
-done
-
-# Check for VS Code path
-sleep 0.5
-if [ -z "$VSCODE_PATH" ]; then
-    echo 'No path specified. Signing off...'
-    exit 1
-fi
-
-# Use custom extensions if provided
-sleep 0.25
-if [ ${#CUSTOM_EXTENSIONS[@]} -ne 0 ]; then
-    # Sanitize extensions by removing leading dots
-    for i in "${!CUSTOM_EXTENSIONS[@]}"; do
-        CUSTOM_EXTENSIONS[$i]=${CUSTOM_EXTENSIONS[$i]#.}
+        case $key in
+            --path|-p)
+                VSCODE_PATH="$2"
+                shift # past argument
+                shift # past value
+                ;;
+            --ext)
+                while [[ $# -gt 1 && ! $2 == --* ]]; do
+                    CUSTOM_EXTENSIONS+=("$2")
+                    shift # past each extension
+                done
+                shift # past --ext
+                ;;
+            *) # unkown option
+                shift # past argument
+                ;;
+        esac
     done
-    # Replace default extensions with custom extensions
-    echo "Using custom extensions: ${CUSTOM_EXTENSIONS[@]}"
-    EXTENSIONS=("${CUSTOM_EXTENSIONS[@]}")
-else 
-    echo "Using default extensions: ${EXTENSIONS[@]}"
-fi
+    echo "VSCode path: $VSCODE_PATH"
+    echo "Custom extensions: ${CUSTOM_EXTENSIONS[@]}"
+}
 
-# VSCODE
-sleep 0.25
-echo "Using path $VSCODE_PATH"
-printf 'Fetching bundle ID... '
+# Sanitize and set the file extensions to be associated
+mvassoc_set_extensions() {
+    if [ ${#CUSTOM_EXTENSIONS[@]} -ne 0 ]; then
+        echo "Using custom extensions: "
+        for i in "${!CUSTOM_EXTENSIONS[@]}"; do
+            CUSTOM_EXTENSIONS[$i]=${CUSTOM_EXTENSIONS[$i]#.}
+            echo "  .${CUSTOM_EXTENSIONS[$i]}"
+        done
+        EXTENSIONS=("${CUSTOM_EXTENSIONS[@]}")
+    else 
+        echo "Using default extensions:"
+        for i in "${!EXTENSIONS[@]}"; do
+            EXTENSIONS[$i]=${EXTENSIONS[$i]#.}
+            echo "  .${EXTENSIONS[$i]}"
+        done
+    fi
+}
 
-VSCODE_BUNDLEID=$(mdls "$VSCODE_PATH" | grep kMDItemCFBundleIdentifier | awk -F'"' '{print $2}')
-
-sleep 0.5
-if [ ! "$VSCODE_BUNDLEID" ]; then
-    echo && echo "Bundle ID not found. Please check your path." && echo "Signing off..." && exit 1
-fi
-
-echo "($VSCODE_BUNDLEID)"
-echo
-
-# DUTI
-sleep 1
-echo "Checking if duti (Homebrew) is installed..."
-
-# Check if duti is installed
-sleep 0.25
-if ! command -v duti &> /dev/null; then
-    echo "duti is not installed."
-    echo "Would you like to install it using Homebrew? (y/n): " 
-    read answer
-    
-    [ -n "$answer" ] && answer=${answer,,};
-    if [ "answer" = "y" ]; then
-        sleep 0.25
-        # Install Homebrew if not installed
-        if ! command -v brew &> /dev/null
-        then
-            echo "Homebrew is not installed. Go to https://brew.sh/ to learn more. Signing off..."
-            exit 1
-        fi
-
-        sleep 0.5
-        echo "Installing duti using Homebrew..."
-        brew install duti
-    else
-        echo "duti installation was skipped. Signing off..."
+# Fetch the VSCode bundle ID from the provided path
+mvassoc_fetch_vscode_bundle_id() {
+    # Verify if mdls command is available
+    if ! command -v mdls &> /dev/null; then
+        echo "Error: mdls command not found. Please ensure macOS is up to date."
         exit 1
     fi
-else
-    echo "duti is already installed. Proceeding..."
-fi
 
+    VSCODE_BUNDLEID=$(mdls "$VSCODE_PATH" | grep kMDItemCFBundleIdentifier | awk -F'"' '{print $2}')
+    if [ ! "$VSCODE_BUNDLEID" ]; then
+        echo "Error: Bundle ID not found. Please check your VSCode path."
+        exit 1
+    fi
+    echo "Bundle ID: $VSCODE_BUNDLEID"
+}
+
+# Check if duti is installed, and propose installation via Homebrew if not
+duti_check_install() {
+    if ! command -v duti &> /dev/null; then
+        echo "duti is not installed."
+        read -p "Would you like to install it using Homebrew? (y/n): " answer
+        answer=${answer,,}  # lowercase conversion
+        if [ "$answer" = "y" ]; then
+            if ! command -v brew &> /dev/null; then
+                echo "Homebrew is not installed. Please install it first."
+                exit 1
+            fi
+            echo "Installing duti using Homebrew..."
+            brew install duti
+        else
+            echo "duti installation was skipped."
+            exit 1
+        fi
+    else
+        echo "duti is already installed."
+    fi
+}
+
+# Associate each extension with Visual Studio Code using duti
+mvaassoc_duti_associate_extensions() {
+    # Associations confirmation
+    read -p "Would you like to continue? (Y/n): " answer
+    [ -n "$answer" ] && answer=${answer,,};
+    if [ "$answer" != "y" ] && [ -n "$answer" ]; then
+        echo "Associations skipped. Signing off..."
+        exit 1
+    fi
+
+    SLEEP_TIME=$(echo "scale=2; 0.25 / ${#EXTENSIONS[@]}" | bc)
+    for ext in "${EXTENSIONS[@]}"; do
+        sleep $SLEEP_TIME
+        echo "Associating .$ext with VS Code"
+        duti -s "$VSCODE_BUNDLEID" .$ext all
+    done
+}
+
+# Main execution flow of the script
+sleep 0.25
+mvassoc_parse_arguments "$@"
 echo
-
-# ASSOCIATION
-sleep 1
-# Check if the user wants to associate the extensions with VS Code
-printf "The following file types will be associated with Visual Studio Code: "
-
-# Calculate the sleep denominator as 1 divided by the length of the array
-# Using bc (Basic Calculator) for floating point division
-SLEEP_TIME=$(echo "scale=2; 0.25 / ${#EXTENSIONS[@]}" | bc)
-# echo $SLEEP_TIME
-for ext in "${EXTENSIONS[@]}"; do
-    sleep $SLEEP_TIME
-    printf ".$ext "
-done
-echo
-
-sleep 0.5
-read -p "Would you like to continue? (Y/n): " answer
-[ -n "$answer" ] && answer=${answer,,};
-if [ "$answer" != "y" ] && [ -n "$answer" ]; then
-    echo "Associations skipped. Signing off..."
-    exit 1
-fi
-echo
-
-sleep 0.5
-echo "Associating extensions with VS Code ($VSCODE_BUNDLEID)..."
 
 sleep 0.25
-# Loop through each extension and set VS Code as the default application
-for ext in "${EXTENSIONS[@]}"; do
-    sleep $SLEEP_TIME
-    echo "[.$ext]: Setting VSCode as the default for .$ext files"
-    duti -s "$VSCODE_BUNDLEID" .$ext all
-done
+mvassoc_set_extensions
+echo 
+
+sleep 0.25
+mvassoc_fetch_vscode_bundle_id
+duti_check_install
 echo
 
-# Restart Finder to refresh icon cache
 sleep 0.5
-echo "Restarting Finder to update icon associations... "
+mvaassoc_duti_associate_extensions
+echo 
+
+sleep 0.25
+echo "Restarting Finder to update icon associations..."
 killall Finder
-echo
+echo 
 
 sleep 0.25
-echo "Task attempted. Please check if the associations were set correctly by opening a file in Finder."
-
-sleep 0.5
-echo "Proceeding to close."
+echo "Task attempt completed. Please check the associations. Closing..."
 exit 0
