@@ -205,35 +205,28 @@ mvscassoc_duti_associate_extensions() {
 }
 
 
-# ---------------------------------
-# MAIN execution flow of the script
-# ---------------------------------
+#####################################
+# MAIN execution flow of the script #
+#####################################
 
-# Print a newline for better output readability
 echo 
 echo "${GREEN}Starting the Visual Studio Code File Association Tool...${NC}"
 
-# Short pause for better output readability
 sleep 0.25
 
 # Parse the command-line arguments provided to the script
 # This function sets the VSCode path and custom extensions if provided
 mvscassoc_parse_arguments "$@"
 
-# Add a newline for output separation
-echo
 
-# Short pause before processing extensions
+echo
 sleep 0.25
 
 # Set the file extensions to be associated with VSCode
 # This function uses either the provided custom extensions or the default set
 mvscassoc_set_extensions
 
-# Add a newline for output separation
 echo 
-
-# Short pause before fetching the bundle ID
 sleep 0.25
 
 # Fetch the VSCode bundle ID from the provided path
@@ -244,20 +237,15 @@ mdls_fetch_vscode_bundle_id_from_path
 # 'duti' is a tool required for changing file associations on macOS
 duti_check_install
 
-# Add a newline for output separation
-echo
 
-# Short pause before starting the association process
+echo
 sleep 0.5
 
 # Associate the specified file extensions with VSCode using 'duti'
 # This function iterates over each extension and sets it to open with VSCode
 mvscassoc_duti_associate_extensions
 
-# Add a newline for output separation
 echo 
-
-# Short pause before restarting Finder
 sleep 0.25
 
 # Restart Finder to apply the updated file associations
@@ -265,15 +253,14 @@ sleep 0.25
 echo "⚠️ Restarting Finder to update icon associations..."
 killall Finder
 
-# Add a newline for output separation
 echo 
-
-# Short pause before the final message
 sleep 0.25
 
 # Final message indicating that the script has completed its tasks
 # Prompt the user to check the updated file associations
-echo "${GREEN}Task attempt completed. Please check the associations.${NC}"
+printf "${GREEN}Task attempt completed. Please check the associations.${NC} "
+
+sleep 0.5
 echo "Closing..."
 
 # Exit the script
