@@ -82,22 +82,36 @@ mvassoc_set_extensions() {
 }
 
 
-# Fetch the VSCode bundle ID from the provided path
+# Function to fetch the Visual Studio Code bundle ID from the provided path
 mdls_fetch_vscode_bundle_id_from_path() {
-    # Verify if mdls command is available
+    # First, ensure that the 'mdls' command is available on the system.
+    # The 'mdls' command is used to get metadata attributes for a specified file in macOS.
     if ! command -v mdls &> /dev/null; then
+        # If 'mdls' command is not found, print an error message and exit.
+        # This check is crucial as the function relies on 'mdls' to retrieve the bundle ID.
         echo "Error: mdls command not found. Please ensure macOS is up to date."
         exit 1
     fi
 
+    # Use 'mdls' to get the bundle identifier of the VS Code application.
+    # The command extracts metadata from the provided VSCode application path.
     VSCODE_BUNDLEID=$(mdls "$VSCODE_PATH" | grep kMDItemCFBundleIdentifier | awk -F'"' '{print $2}')
+
+    # Check if the bundle ID was successfully retrieved.
     if [ ! "$VSCODE_BUNDLEID" ]; then
+        # If the bundle ID is not found, print an error message and exit.
+        # A missing bundle ID indicates an issue with the provided VSCode path.
         echo "Error: Bundle ID not found. Please check your VSCode path."
         exit 1
     fi
+
+    # Print the retrieved bundle ID and the path it was set to.
+    # This output is useful for confirming that the correct bundle ID was obtained.
     echo "$VSCODE_BUNDLEID path set to '$VSCODE_PATH'"
+    # Uncomment the line below to directly display the Bundle ID.
     # echo "Bundle ID: $VSCODE_BUNDLEID"
 }
+
 
 # Check if duti is installed, and propose installation via Homebrew if not
 duti_check_install() {
