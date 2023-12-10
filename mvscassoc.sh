@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# ANSI color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
 # Default file extensions to associate with Visual Studio Code
 EXTENSIONS=("py" "js" "ts" "tsx" "css" "java" "cpp" "c" "json" "md" "xml" "sql" "php" "rb" "go" "sh")
 
@@ -89,7 +95,7 @@ mdls_fetch_vscode_bundle_id_from_path() {
     if ! command -v mdls &> /dev/null; then
         # If 'mdls' command is not found, print an error message and exit.
         # This check is crucial as the function relies on 'mdls' to retrieve the bundle ID.
-        echo "Error: mdls command not found. Please ensure macOS is up to date."
+        echo "${RED}Error: mdls command not found. Please ensure macOS is up to date.${NC}"
         exit 1
     fi
 
@@ -101,13 +107,13 @@ mdls_fetch_vscode_bundle_id_from_path() {
     if [ ! "$VSCODE_BUNDLEID" ]; then
         # If the bundle ID is not found, print an error message and exit.
         # A missing bundle ID indicates an issue with the provided VSCode path.
-        echo "Error: Bundle ID not found. Please check your VSCode path."
+        echo "${RED}Error: Bundle ID not found. Please check your VSCode path.${NC}"
         exit 1
     fi
 
     # Print the retrieved bundle ID and the path it was set to.
     # This output is useful for confirming that the correct bundle ID was obtained.
-    echo "$VSCODE_BUNDLEID path set to '$VSCODE_PATH'"
+    echo "${GREEN}$VSCODE_BUNDLEID package is in '$VSCODE_PATH'.${NC}"
     # Uncomment the line below to directly display the Bundle ID.
     # echo "Bundle ID: $VSCODE_BUNDLEID"
 }
@@ -118,12 +124,12 @@ duti_check_install() {
     # Check if the 'duti' command is available on the system
     if command -v duti &> /dev/null; then
         # If 'duti' is already installed, inform the user and exit the function
-        echo "duti is already installed."
+        echo "${GREEN}duti is already installed.${NC}"
         return 0
     fi
 
     # If 'duti' is not installed, inform the user
-    echo "duti is not installed."
+    echo "${YELLOW}duti is not installed.${NC}"
 
     # Prompt the user to install 'duti' using Homebrew
     read -p "⚠️ Would you like to install it using Homebrew? (y/n): " answer
@@ -140,7 +146,7 @@ duti_check_install() {
     # Before proceeding with 'duti' installation, ensure Homebrew is installed
     if ! command -v brew &> /dev/null; then
         # If Homebrew is not installed, inform the user and provide instructions
-        echo "Error: Homebrew package manager (https://brew.sh) required is not installed. Please install it first."
+        echo "${RED}Error: Homebrew package manager (https://brew.sh) required is not installed. Please install it first.${NC}"
         exit 1
     fi
 
@@ -172,6 +178,7 @@ mvscassoc_duti_associate_extensions() {
         exit 1
     fi
 
+    echo
     # Calculate the time to sleep between each association attempt
     # This is done to prevent overwhelming the system with rapid successive commands
     # The time is calculated based on the number of extensions to be processed
@@ -194,7 +201,7 @@ mvscassoc_duti_associate_extensions() {
     # After processing all extensions, inform the user that the operation is complete
     echo
     sleep 0.5
-    echo "Association attempts completed."
+    echo "${GREEN}Association attempts completed.${NC}"
 }
 
 
@@ -204,6 +211,7 @@ mvscassoc_duti_associate_extensions() {
 
 # Print a newline for better output readability
 echo 
+echo "\n${GREEN}Starting the Visual Studio Code File Association Tool...${NC}"
 
 # Short pause for better output readability
 sleep 0.25
@@ -265,7 +273,8 @@ sleep 0.25
 
 # Final message indicating that the script has completed its tasks
 # Prompt the user to check the updated file associations
-echo "Task attempt completed. Please check the associations. Closing..."
+echo "${GREEN}Task attempt completed. Please check the associations.${NC}"
+echo "Closing..."
 
 # Exit the script
 exit 0
