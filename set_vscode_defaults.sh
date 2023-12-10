@@ -9,31 +9,40 @@ CUSTOM_EXTENSIONS=()
 
 # Function to parse command-line arguments
 mvassoc_parse_arguments() {
-    # Parse command-line arguments for path and extensions
+    # Loop over all arguments passed to the script
+    # This allows for handling multiple arguments and flags
     while [[ $# -gt 0 ]]; do
-        key="$1"
+        key="$1"  # Store the current argument in the 'key' variable
 
+        # Use a case statement to handle different types of arguments
         case $key in
             --path|-p)
+                # When the --path or -p flag is used, set the next argument as the VSCode path
                 VSCODE_PATH="$2"
-                shift # past argument
-                shift # past value
+                shift # Move past the argument ('--path' or '-p')
+                shift # Move past the value (the actual path)
                 ;;
             --ext)
+                # When the --ext flag is used, collect all following arguments as custom extensions
                 while [[ $# -gt 1 && ! $2 == --* ]]; do
+                    # Add each extension to the CUSTOM_EXTENSIONS array
                     CUSTOM_EXTENSIONS+=("$2")
-                    shift # past each extension
+                    shift # Move past each extension
                 done
-                shift # past --ext
+                shift # Once all extensions are collected, move past the --ext flag
                 ;;
-            *) # unkown option
-                shift # past argument
+            *) # If an unknown option is encountered
+                # Simply move past the argument without any action
+                shift # This ensures the script doesn't get stuck on an unexpected argument
                 ;;
         esac
     done
+
+    # Uncomment the below lines for debugging purposes
     # echo "VSCode path: $VSCODE_PATH"
     # echo "Custom extensions: ${CUSTOM_EXTENSIONS[@]}"
 }
+
 
 # Sanitize and set the file extensions to be associated
 mvassoc_set_extensions() {
