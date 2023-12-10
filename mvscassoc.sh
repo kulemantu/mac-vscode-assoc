@@ -211,7 +211,7 @@ mvscassoc_duti_associate_extensions() {
 
 # Print a newline for better output readability
 echo 
-echo "\n${GREEN}Starting the Visual Studio Code File Association Tool...${NC}"
+echo "${GREEN}Starting the Visual Studio Code File Association Tool...${NC}"
 
 # Short pause for better output readability
 sleep 0.25
