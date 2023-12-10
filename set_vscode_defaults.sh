@@ -31,8 +31,8 @@ mvassoc_parse_arguments() {
                 ;;
         esac
     done
-    echo "VSCode path: $VSCODE_PATH"
-    echo "Custom extensions: ${CUSTOM_EXTENSIONS[@]}"
+    # echo "VSCode path: $VSCODE_PATH"
+    # echo "Custom extensions: ${CUSTOM_EXTENSIONS[@]}"
 }
 
 # Sanitize and set the file extensions to be associated
@@ -44,17 +44,18 @@ mvassoc_set_extensions() {
             echo "  .${CUSTOM_EXTENSIONS[$i]}"
         done
         EXTENSIONS=("${CUSTOM_EXTENSIONS[@]}")
-    else 
-        echo "Using default extensions:"
-        for i in "${!EXTENSIONS[@]}"; do
-            EXTENSIONS[$i]=${EXTENSIONS[$i]#.}
-            echo "  .${EXTENSIONS[$i]}"
-        done
-    fi
+        exit 1
+    fi 
+    
+    echo "Using default extensions:"
+    for i in "${!EXTENSIONS[@]}"; do
+        EXTENSIONS[$i]=${EXTENSIONS[$i]#.}
+        echo "  .${EXTENSIONS[$i]}"
+    done
 }
 
 # Fetch the VSCode bundle ID from the provided path
-mvassoc_fetch_vscode_bundle_id() {
+mdls_fetch_vscode_bundle_id_from_path() {
     # Verify if mdls command is available
     if ! command -v mdls &> /dev/null; then
         echo "Error: mdls command not found. Please ensure macOS is up to date."
@@ -66,35 +67,40 @@ mvassoc_fetch_vscode_bundle_id() {
         echo "Error: Bundle ID not found. Please check your VSCode path."
         exit 1
     fi
-    echo "Bundle ID: $VSCODE_BUNDLEID"
+    echo "$VSCODE_BUNDLEID path set to: $VSCODE_PATH"
+    # echo "Bundle ID: $VSCODE_BUNDLEID"
 }
 
 # Check if duti is installed, and propose installation via Homebrew if not
 duti_check_install() {
-    if ! command -v duti &> /dev/null; then
-        echo "duti is not installed."
-        read -p "Would you like to install it using Homebrew? (y/n): " answer
-        answer=${answer,,}  # lowercase conversion
-        if [ "$answer" = "y" ]; then
-            if ! command -v brew &> /dev/null; then
-                echo "Homebrew is not installed. Please install it first."
-                exit 1
-            fi
-            echo "Installing duti using Homebrew..."
-            brew install duti
-        else
-            echo "duti installation was skipped."
-            exit 1
-        fi
-    else
+    if command -v duti &> /dev/null; then
         echo "duti is already installed."
+        return
     fi
+    
+    echo "duti is not installed."
+    read -p "⚠️ Would you like to install it using Homebrew? (y/n): " answer
+    [ -n "${answer}" ] && answer=${answer,,}; # lowercase conversion
+    if [ "$answer" != "y" ]; then
+        echo "duti installation was skipped."
+        exit 1
+    fi
+
+    # Check if Homebrew is installed, we will not propose to install it
+    if ! command -v brew &> /dev/null; then
+        echo "Error: Homebrew package manager (https://brew.sh) required is not installed. Please install it first."
+        exit 1
+    fi
+    echo "⚠️ Installing duti using Homebrew..."
+    brew install duti
+    sleep 0.5
+    echo "duti installation completed."
 }
 
 # Associate each extension with Visual Studio Code using duti
 mvaassoc_duti_associate_extensions() {
     # Associations confirmation
-    read -p "Would you like to continue? (Y/n): " answer
+    read -p "⚠️ Would you like to continue? (Y/n): " answer
     [ -n "$answer" ] && answer=${answer,,};
     if [ "$answer" != "y" ] && [ -n "$answer" ]; then
         echo "Associations skipped. Signing off..."
@@ -107,6 +113,8 @@ mvaassoc_duti_associate_extensions() {
         echo "Associating .$ext with VS Code"
         duti -s "$VSCODE_BUNDLEID" .$ext all
     done
+    sleep 0.5
+    echo "Association attempts completed."
 }
 
 # Main execution flow of the script
@@ -119,7 +127,7 @@ mvassoc_set_extensions
 echo 
 
 sleep 0.25
-mvassoc_fetch_vscode_bundle_id
+mdls_fetch_vscode_bundle_id_from_path
 duti_check_install
 echo
 
@@ -128,7 +136,7 @@ mvaassoc_duti_associate_extensions
 echo 
 
 sleep 0.25
-echo "Restarting Finder to update icon associations..."
+echo "⚠️ Restarting Finder to update icon associations..."
 killall Finder
 echo 
 
