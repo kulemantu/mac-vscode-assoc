@@ -131,14 +131,15 @@ duti_check_install() {
     # If 'duti' is not installed, inform the user
     echo "${YELLOW}duti is not installed.${NC}"
 
+    echo 
     # Prompt the user to install 'duti' using Homebrew
-    read -p "⚠️ Would you like to install it using Homebrew? (y/n): " answer
+    read -p "⚠️  Would you like to install it using Homebrew? (Y/n): " answer
 
-    # Convert the user's answer to lowercase for consistent comparison
-    [ -n "${answer}" ] && answer=${answer,,}; 
+    # Convert the response to lowercase for consistent comparison
+    [ -n "$answer" ] && answer=${answer,,}; 
 
     # If the user's response is not 'y', skip the installation and exit
-    if [ "$answer" != "y" ]; then
+    if [ "$answer" != "y" ] && [ -n "$answer" ]; then
         echo "duti installation was skipped."
         exit 1
     fi
@@ -152,7 +153,7 @@ duti_check_install() {
 
     # If Homebrew is installed, proceed with installing 'duti'
     echo
-    echo "⚠️ Installing duti using Homebrew..."
+    echo "⚠️  Installing duti using Homebrew..."
     brew install duti
 
     # Wait briefly before confirming completion
@@ -166,7 +167,7 @@ duti_check_install() {
 mvscassoc_duti_associate_extensions() {
     # Prompt the user for confirmation before proceeding with file associations
     # This is a safety measure to ensure the user is ready to make the changes
-    read -p "⚠️ Would you like to continue? (Y/n): " answer
+    read -p "⚠️  Would you like to continue? (Y/n): " answer
 
     # Convert the response to lowercase for consistent comparison
     [ -n "$answer" ] && answer=${answer,,};
@@ -250,7 +251,7 @@ sleep 0.25
 
 # Restart Finder to apply the updated file associations
 # This is required as Finder caches file association information
-echo "⚠️ Restarting Finder to update icon associations..."
+echo "⚠️  Restarting Finder to update icon associations..."
 killall Finder
 
 echo 
