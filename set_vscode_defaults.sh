@@ -179,7 +179,9 @@ mvaassoc_duti_associate_extensions() {
     echo "Association attempts completed."
 }
 
-# Main execution flow of the script
+# ---------------------------------
+# MAIN execution flow of the script
+# ---------------------------------
 
 # Print a newline for better output readability
 echo 
